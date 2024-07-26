@@ -1,6 +1,5 @@
-function PDFViewer() {
-  return (
-	<div>PDFViewer</div>
-  )
+"use client";
+
+export function PDFViewer({ url }: { url: string }) {
+  return <iframe src={url} className="w-full h-screen" />;
 }
-export default PDFViewer
