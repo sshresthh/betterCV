@@ -1,4 +1,4 @@
-import CVForm from "@/components/CVForm";
+import { CVForm } from "@/components/CVForm";
 
 export default function CreateCV() {
   return (
