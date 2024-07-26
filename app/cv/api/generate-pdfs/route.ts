@@ -1,31 +1,17 @@
-// app/api/generate-pdf/route.ts
-import { NextResponse } from 'next/server'
-import { getCV } from '@/lib/cvOperations'
-import { generatePDF } from '@/lib/pdfGenerator' // You'll need to implement this
+// app/auth/callback/route.ts
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  try {
-    const { id } = await req.json()
-    
-    // Fetch CV data
-    const cv = await getCV(id)
-    
-    // Generate PDF
-    const pdfBuffer = await generatePDF(cv.content)
-    
-    // Create a Blob from the PDF Buffer
-    const blob = new Blob([pdfBuffer], { type: 'application/pdf' })
-    
-    // Create a response with the PDF
-    return new NextResponse(blob, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="cv_${id}.pdf"`,
-      },
-    })
-  } catch (error) {
-    console.error('Error generating PDF:', error)
-    return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get("code");
+
+  if (code) {
+    const supabase = createRouteHandlerClient({ cookies });
+    await supabase.auth.exchangeCodeForSession(code);
   }
+
+  // URL to redirect to after sign in process completes
+  return NextResponse.redirect(requestUrl.origin);
 }
