@@ -1,3 +1,4 @@
+// components/CVForm.tsx
 "use client";
 
 import { createCV, getCV, updateCV } from "@/lib/cvOperations";
@@ -23,8 +24,10 @@ export function CVForm({ id }: { id?: string }) {
   }, [id]);
 
   const fetchCV = async () => {
-    const cv = await getCV(id);
-    setFormData(cv.content);
+    if (id) {
+      const cv = await getCV(id);
+      setFormData(cv.content);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
