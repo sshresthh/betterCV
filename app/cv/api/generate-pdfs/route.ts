@@ -1,27 +1,31 @@
-import { fillLatexTemplate } from "@/lib/latex-template";
-import { supabase } from "@/lib/supabase";
-import { NextResponse } from "next/server";
+// app/api/generate-pdf/route.ts
+import { NextResponse } from 'next/server'
+import { getCV } from '@/lib/cvOperations'
+import { generatePDF } from '@/lib/pdfGenerator' // You'll need to implement this
 
 export async function POST(req: Request) {
-  const data = await req.json();
-
-  // TODO: Validate input data
-
-  // Generate LaTeX content
-  const latexTemplate = ""; // Load your LaTeX template
-  const filledLatex = fillLatexTemplate(latexTemplate, data);
-
-  // TODO: Convert LaTeX to PDF (you'll need a service or library for this)
-
-  // Save to Supabase
-  const { data: savedData, error } = await supabase
-    .from("cvs")
-    .insert({ content: filledLatex, user_data: data })
-    .select();
-
-  if (error) {
-    return NextResponse.json({ error: "Failed to save CV" }, { status: 500 });
+  try {
+    const { id } = await req.json()
+    
+    // Fetch CV data
+    const cv = await getCV(id)
+    
+    // Generate PDF
+    const pdfBuffer = await generatePDF(cv.content)
+    
+    // Create a Blob from the PDF Buffer
+    const blob = new Blob([pdfBuffer], { type: 'application/pdf' })
+    
+    // Create a response with the PDF
+    return new NextResponse(blob, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="cv_${id}.pdf"`,
+      },
+    })
+  } catch (error) {
+    console.error('Error generating PDF:', error)
+    return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 })
   }
-
-  return NextResponse.json({ id: savedData[0].id });
 }
