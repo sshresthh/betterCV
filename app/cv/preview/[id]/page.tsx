@@ -1,4 +1,4 @@
-import CVPreview from "@/components/CVPreview";
+import { CVPreview } from "@/components/CVPreview";
 
 export default function PreviewCV({ params }: { params: { id: string } }) {
   return (
