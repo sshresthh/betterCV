@@ -32,3 +32,10 @@ export async function updateCV(id: string, cv: CV) {
   if (error) throw error;
   return data;
 }
+
+export async function deleteCV(id: string) {
+  const { data, error } = await supabase.from("cvs").delete().eq("id", id);
+
+  if (error) throw error;
+  return data;
+}
